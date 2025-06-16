@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Analysis: Atlassian Intelligence for ITSM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #0d9488;
+            border-bottom-color: #0d9488;
+        }
+        .tab-button.active {
+            background-color: #0d9488;
+            color: white;
+        }
+        .phase-step.active {
+            border-color: #0d9488;
+            background-color: #ccfbf1;
+        }
+        .phase-step.active .phase-number {
+             background-color: #0d9488;
+             color: white;
+        }
+        .comparison-toggle:checked + .comparison-label {
+            background-color: #0d9488;
+        }
+        .comparison-toggle:checked + .comparison-label > div {
+            transform: translateX(1.5rem);
+        }
+        .audio-btn{
+            background-color: #69b719;
+            color: white;
+        }
+        .audio-btn.playing {
+            background-color: #53cbf9;
+            color: white;
+        }
+        svg.h-6.w-6 {
+            margin: auto;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800 antialiased">
+
+    <audio id="audio-hero" src="assets/Atlassian_ITSM_USTA_Recording.mp3"></audio>
+    <audio id="audio-capabilities" src="placeholder.mp3"></audio>
+    <audio id="audio-advantage" src="placeholder.mp3"></audio>
+    <audio id="audio-roadmap" src="placeholder.mp3"></audio>
+    <audio id="audio-integrations" src="placeholder.mp3"></audio>
+
+    <header id="header" class="bg-stone-50/80 backdrop-blur-lg sticky top-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                 <a href="#hero">
+                    <h1 class="text-xl font-bold text-teal-800">ITSM AI Analysis</h1>
+                    <span style="font: small-caption; color: #000; font-weight: bold;font-style: italic;">by Vic Vartanian</span>
+                 <a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#hero" class="nav-link px-3 py-2 text-sm font-medium">Home</a>
+                        <a href="#capabilities" class="nav-link px-3 py-2 text-sm font-medium">Capabilities</a>
+                        <a href="#advantage" class="nav-link px-3 py-2 text-sm font-medium">The AI Advantage</a>
+                        <a href="#roadmap" class="nav-link px-3 py-2 text-sm font-medium">Strategic Roadmap</a>
+                        <a href="#integrations" class="nav-link px-3 py-2 text-sm font-medium">Integrations</a>
+                    </div>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-stone-800 hover:bg-stone-200 focus:outline-none">
+                        <span class="sr-only">Open main menu</span>
+                        <div id="hamburger-icon" class="space-y-1.5">
+                            <span class="block w-6 h-0.5 bg-current"></span>
+                            <span class="block w-6 h-0.5 bg-current"></span>
+                            <span class="block w-6 h-0.5 bg-current"></span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#hero" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-800 hover:bg-stone-200">Home</a>
+                <a href="#capabilities" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-800 hover:bg-stone-200">Capabilities</a>
+                <a href="#advantage" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-800 hover:bg-stone-200">The AI Advantage</a>
+                <a href="#roadmap" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-800 hover:bg-stone-200">Strategic Roadmap</a>
+                <a href="#integrations" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-stone-800 hover:bg-stone-200">Integrations</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32 bg-white">
+            <div class="container mx-auto text-center px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-center items-center gap-4">
+                    <img src="assets/USTA_1c-black_RGB.png" style="width: 70%;">
+               </div>
+  
+                <div class="flex justify-center items-center gap-4">
+                    <h2 class="text-4xl md:text-6xl font-bold tracking-tight text-stone-900" style="color:#187bc0;">
+                        An Interactive Analysis of Atlassian Intelligence for ITSM
+                    </h2>
+                </div>
+                <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-stone-600">
+                    A comprehensive technical and strategic assessment of Atlassian Intelligence for Jira Service Management (JSM), designed to help technical leaders move from a reactive to a proactive operational posture.
+                </p>
+                <div class="flex justify-center items-center gap-4" style="padding-top: 1rem;">
+                <button class="audio-btn p-2 rounded-full hover:bg-stone-200 transition-colors" data-audio-id="audio-hero" title="Listen to this section">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5 5 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                    </svg>
+                    </button>
+                </div>
+                <div class="mt-10">
+                    <a href="#capabilities" class="inline-block bg-teal-600 text-white font-semibold px-8 py-3 rounded-lg shadow-lg hover:bg-teal-700 transition-colors duration-300">
+                        Explore the Analysis
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="capabilities" class="py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                     <div class="flex justify-center items-center gap-4">
+                        <h3 class="text-3xl md:text-4xl font-bold">Key Capabilities Framework</h3>
+                    </div>
+                    <p class="mt-4 max-w-2xl mx-auto text-stone-600">
+                        Atlassian Intelligence for ITSM is built on four key pillars designed to enhance service delivery. This section provides an interactive dashboard of the core features within each pillar. Click on a pillar to explore its capabilities.
+                    </p>
+                </div>
+                <div class="w-full max-w-2xl mx-auto mb-8 p-1.5 bg-stone-200 rounded-lg flex space-x-2">
+                    <button class="tab-button w-full py-2.5 text-sm font-medium leading-5 rounded-md focus:outline-none transition-colors duration-300" data-tab="accelerate">🚀 Accelerate</button>
+                    <button class="tab-button w-full py-2.5 text-sm font-medium leading-5 rounded-md focus:outline-none transition-colors duration-300" data-tab="automate">🤖 Automate</button>
+                    <button class="tab-button w-full py-2.5 text-sm font-medium leading-5 rounded-md focus:outline-none transition-colors duration-300" data-tab="optimize">🛠️ Optimize</button>
+                    <button class="tab-button w-full py-2.5 text-sm font-medium leading-5 rounded-md focus:outline-none transition-colors duration-300" data-tab="resolve">💡 Resolve</button>
+                </div>
+                <div id="tab-content" class="mt-8"></div>
+            </div>
+        </section>
+        
+        <section id="advantage" class="py-20 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <div class="flex justify-center items-center gap-4">
+                        <h3 class="text-3xl md:text-4xl font-bold">The AI Advantage: A Comparative Story</h3>
+                    </div>
+                    <p class="mt-4 max-w-3xl mx-auto text-stone-600">
+                        To understand the true impact of Atlassian Intelligence, this section contrasts a standard ITSM workflow with an AI-enhanced one through a typical production incident. Use the toggle to switch between the "Before" (Standard JSM) and "After" (AI-Enhanced) views for each stage of the incident lifecycle.
+                    </p>
+                </div>
+                 <div class="flex justify-center items-center my-8">
+                    <span class="text-stone-600 font-medium mr-3">Standard JSM</span>
+                    <input type="checkbox" id="comparison-toggle" class="comparison-toggle hidden">
+                    <label for="comparison-toggle" class="comparison-label w-14 h-8 bg-stone-300 rounded-full flex items-center p-1 cursor-pointer transition-colors duration-300">
+                        <div class="w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300"></div>
+                    </label>
+                    <span class="text-teal-600 font-medium ml-3">AI-Enhanced JSM</span>
+                </div>
+                <div id="comparison-container" class="lg:grid lg:grid-cols-12 lg:gap-8"></div>
+            </div>
+        </section>
+
+        <section id="roadmap" class="py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                     <div class="flex justify-center items-center gap-4">
+                        <h3 class="text-3xl md:text-4xl font-bold">Strategic Roadmap & Assessment</h3>
+                    </div>
+                    <p class="mt-4 max-w-3xl mx-auto text-stone-600">
+                        Implementing Atlassian Intelligence is a strategic decision. This section provides a balanced view of the benefits and risks, followed by a recommended phased implementation plan to maximize value and mitigate challenges.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 lg:gap-12 mb-20">
+                    <div id="benefits-section">
+                        <h4 class="text-2xl font-semibold text-center mb-6 text-teal-700">Quantifiable Benefits</h4>
+                        <p class="text-stone-600 mb-6 text-center">AI integration yields significant, measurable improvements in key ITSM performance metrics.</p>
+                        <div class="chart-container"><canvas id="benefitsChart"></canvas></div>
+                    </div>
+                    <div id="risks-section">
+                        <h4 class="text-2xl font-semibold text-center mb-6 text-red-700">Critical Risks & Drawbacks</h4>
+                        <p class="text-stone-600 mb-6 text-center">Adoption requires careful consideration of costs, data privacy, feature maturity, and operational dependencies.</p>
+                        <div class="space-y-4"></div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-semibold text-center mb-8">Phased Implementation Plan</h4>
+                    <div id="phases-container" class="flex flex-col md:flex-row justify-center items-start md:items-center space-y-4 md:space-y-0 md:space-x-4 mb-8"></div>
+                    <div id="phase-details-container" class="mt-8 p-6 bg-white rounded-lg shadow-md min-h-[250px]"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="integrations" class="py-20 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                     <div class="flex justify-center items-center gap-4">
+                        <h3 class="text-3xl md:text-4xl font-bold">Beyond the Core: External Integrations</h3>
+                    </div>
+                    <p class="mt-4 max-w-3xl mx-auto text-stone-600">
+                        While powerful, native Atlassian Intelligence has architectural limits. Executing tasks in external systems requires looking towards Atlassian Rovo and the rich ecosystem of third-party apps on the Marketplace.
+                    </p>
+                </div>
+                <div class="mb-16">
+                    <h4 class="text-2xl font-semibold text-center mb-8">Architectural Boundaries</h4>
+                    <div class="max-w-4xl mx-auto p-6 border-2 border-dashed border-stone-300 rounded-lg">
+                        <h5 class="text-lg font-bold text-center mb-4">Broader Enterprise Toolchain</h5>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                                <h6 class="font-bold text-teal-800">Atlassian Rovo & Marketplace</h6>
+                                <p class="text-sm text-teal-700 mt-1">For tasks requiring external data access and actions in third-party systems.</p>
+                                <ul class="mt-2 text-xs text-stone-600 list-disc list-inside">
+                                    <li>Connects to SharePoint, GitHub, etc.</li>
+                                    <li>"Agentic" AI performs complex tasks</li>
+                                    <li>Requires separate licensing</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                <h6 class="font-bold text-blue-800">Native Atlassian Intelligence (JSM)</h6>
+                                <p class="text-sm text-blue-700 mt-1">Powerful for automating processes *within* the Atlassian ecosystem.</p>
+                                <ul class="mt-2 text-xs text-stone-600 list-disc list-inside">
+                                    <li>Cannot generate rules with webhooks</li>
+                                    <li>Limited to internal data (Teamwork Graph)</li>
+                                    <li>Included with Premium/Enterprise plans</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-2xl font-semibold text-center mb-8">Marketplace AI Agents Showcase</h4>
+                    <div id="marketplace-filters" class="flex justify-center flex-wrap gap-2 mb-8"></div>
+                    <div id="marketplace-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-800 text-stone-300 py-8">
+        <div class="container mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <p>This interactive report was generated based on the "Architectural and Strategic Analysis of Atlassian Intelligence for IT Service Management."</p>
+            <p class="text-xs mt-2 text-stone-400">All content is derived from the source report. This is a conceptual application for demonstration purposes. Audio files are placeholders.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const data = {
+        capabilities: {
+            accelerate: {
+                title: '🚀 Accelerate Agent Productivity',
+                description: 'This pillar is about enhancing the productivity of human agents. It encompasses features that speed up workflows from the moment a ticket is triaged to its final resolution.',
+                features: [
+                    { name: 'Contextual Summarization', detail: 'Generate instant summaries of long ticket descriptions, comment threads, or linked pages. Drastically reduces context-switching time for agents, especially during handoffs or escalations.' },
+                    { name: 'Content Generation & Transformation', detail: 'Use AI to draft replies, improve existing text, fix grammar, or change the tone of a message (e.g., from technical to empathetic). Ensures clear, professional communication.' },
+                    { name: 'Knowledge Base Article Generation', detail: 'Assist agents in creating new Confluence knowledge base articles directly from the context of a resolved ticket, capturing institutional knowledge at its source.' }
+                ]
+            },
+            automate: {
+                title: '🤖 Automate the Support Frontline',
+                description: 'This pillar focuses on reducing manual toil and deflecting requests before they require agent intervention, primarily through the Virtual Service Agent (VSA).',
+                features: [
+                    { name: 'Virtual Service Agent (VSA)', detail: 'An AI-powered chatbot that provides 24/7 support. It can handle Tier 1 interactions, guide users through troubleshooting, and provide answers from the knowledge base.' },
+                    { name: 'Intent Flows', detail: 'Manually designed, structured conversational paths for handling specific user goals like software requests. Can collect information and trigger backend actions.' },
+                    { name: 'Generative AI Answers', detail: 'When no Intent Flow matches, the VSA performs a natural language search across the knowledge base to synthesize and provide a conversational answer.' }
+                ]
+            },
+            optimize: {
+                title: '🛠️ Optimize Service Desk Configuration',
+                description: 'This pillar pertains to streamlining the setup and ongoing maintenance of the service desk itself, empowering teams to build and configure their projects more efficiently.',
+                features: [
+                    { name: 'Natural Language to JQL', detail: 'Allows any user to type a search query in plain English, which the AI translates into the correct Jira Query Language (JQL) syntax. Democratizes advanced search.' },
+                    { name: 'Natural Language Automation', detail: 'Create complex automation rules by describing the desired workflow in plain English, lowering the barrier to entry for process automation.' },
+                    { name: 'AI-Powered Configuration', detail: 'Receive AI-driven suggestions for request types, fields, and other configurations when setting up a new service project.' }
+                ]
+            },
+            resolve: {
+                title: '💡 Resolve Incidents Faster (AIOps)',
+                description: 'This pillar is focused on shortening the incident management lifecycle by leveraging AIOps capabilities to detect, prevent, and resolve incidents with greater speed and accuracy.',
+                features: [
+                    { name: 'AI-Powered Alert Grouping', detail: 'Intelligently clusters storms of related alerts from monitoring tools into a single, consolidated group, reducing alert fatigue for on-call engineers.' },
+                    { name: 'Smart Triaging & Incident Creation', detail: 'AI suggests the correct request type and fields for generic tickets and can pre-populate incident details (title, priority) from grouped alerts.' },
+                    { name: 'Similar Incidents/Requests', detail: 'Automatically surfaces a list of similar past incidents and their resolutions directly within the current ticket, providing immediate access to historical knowledge.' }
+                ]
+            }
+        },
+        comparison: [
+            { stage: '1. Intake', standard: 'A monitoring system floods the queue with 50 related alerts. A user reports the issue via Slack, creating a generic ticket. The on-call engineer is immediately faced with a wall of notifications.', enhanced: 'The Virtual Agent in Slack engages the user, gathers initial details, and creates a structured ticket. Simultaneously, AIOps automatically groups the 50 alerts into a single, manageable alert group, drastically reducing noise.' },
+            { stage: '2. Triage', standard: 'The on-call engineer manually sifts through the alert queue, correlates it with the user ticket, and tries to assess priority based on a vague description. This consumes critical minutes.', enhanced: 'AI Triage suggests the correct "Production Incident" request type. Customer Sentiment Analysis flags the user\'s comment as "negative," raising urgency. AI suggests a "High" priority based on the grouped alerts.' },
+            { stage: '3. Onboarding', standard: 'A new agent must spend several minutes reading the entire ticket history and all 50 linked alerts to understand the context, delaying their ability to contribute to the solution.', enhanced: 'The agent clicks "Summarize." AI generates an instant, bulleted overview of the ticket history, core alert info, and user comments. The agent is fully briefed and ready to work in seconds.' },
+            { stage: '4. RCA', standard: 'The agent manually searches Confluence and old Jira tickets for keywords, hoping to find similar past incidents. This relies on inconsistent tagging and memory.', enhanced: 'The "Similar Incidents" panel automatically surfaces three previous, related incidents and their Post-Incident Reviews (PIRs), providing immediate clues about root causes and successful fixes.' },
+            { stage: '5. Communication', standard: 'The agent manually types a technical update for the internal Slack channel and then composes a separate, simplified update for the public-facing status page.', enhanced: 'The agent drafts one technical update. They use AI to "Change Tone" to "Professional" and "Summarize" for a non-technical stakeholder update, posting it in seconds.' },
+            { stage: '6. Resolution', standard: 'The team finds a fix. The agent types out detailed workaround instructions in an internal comment for the rest of the support team to use.', enhanced: 'The team finds the fix. The agent uses the ticket\'s resolution details to have AI help draft a clear, permanent knowledge base article, immediately available for future use.' },
+            { stage: '7. PIR', standard: 'The incident manager spends hours manually compiling a timeline by cross-referencing timestamps from Slack, Jira comments, and deployment logs.', enhanced: 'AI generates a first draft of the Post-Incident Review, including an AI-generated summary and a timeline of key events pulled automatically from the Jira ticket.' }
+        ],
+        risks: [
+            { icon: '💰', title: 'Significant Cost', description: 'Functionality is gated behind Premium or Enterprise plans. Advanced external automation may require an additional Rovo license or third-party app subscriptions.'},
+            { icon: '🔒', title: 'Data Privacy & Trust', description: 'Organizational data is processed by a third-party (OpenAI). Requires thorough review by security, legal, and compliance teams.'},
+            { icon: '⏳', title: 'Feature Maturity', description: 'Many advanced features are still in beta. The quality and accuracy of AI-generated information can vary and may be unreliable.'},
+            { icon: '🔗', title: 'Knowledge Base Dependency', description: 'The effectiveness of the AI, especially the Virtual Agent, is critically dependent on a comprehensive and up-to-date Confluence knowledge base.'}
+        ],
+        phases: [
+            { number: 1, title: 'Quick Wins', details: { action: 'Enable core generative AI features (Summarization, Content Generation) for the Production Support team.', focus: 'Train the team to use these tools for all ticket handoffs, escalations, and communications to standardize and improve quality.', goal: 'Achieve immediate productivity gains and reduce cognitive load on agents with minimal implementation overhead.' } },
+            { number: 2, title: 'Knowledge Foundation', details: { action: 'Conduct a comprehensive audit of the Confluence knowledge base. Identify gaps and outdated articles.', focus: 'Pilot the Virtual Service Agent in AI Answers mode. Use its analytics to drive the creation and updating of high-value knowledge base articles.', goal: 'Build the foundational knowledge for effective self-service and systematically improve the VSA\'s deflection rate.' } },
+            { number: 3, title: 'Targeted Automation', details: { action: 'Analyze service request data to identify the top 3-5 high-volume, repetitive requests.', focus: 'Build structured VSA Intent Flows to fully automate these specific requests. Roll out AI-assisted Triage and Incident Creation to the on-call team.', goal: 'Automate key processes to free up significant agent time and accelerate incident response.' } },
+            { number: 4, title: 'Advanced Integration', details: { action: 'Formally evaluate the business need for automation that requires interaction with external systems.', focus: 'Conduct a strategic evaluation of Atlassian Rovo vs. select Marketplace applications based on use cases, TCO, and security.', goal: 'Select and implement the right tool for advanced, cross-platform automation to extend intelligence to the broader enterprise.' } }
+        ],
+        marketplaceApps: [
+            { name: 'AI Agents for Jira', vendor: 'eesel', func: 'Copilot', description: 'Drafts replies for agents. Can be trained on Confluence, Google Docs, Notion, and past Jira issues.' },
+            { name: 'Workativ AI Agent', vendor: 'Workativ', func: 'Automation', description: 'Provides pre-built automation workflows for user management, access provisioning, and password resets across multiple systems.' },
+            { name: 'AI Automation for Jira', vendor: '123x-mail', func: 'Helper', description: 'Uses AI to assist in writing complex, event-driven automation scripts using JavaScript.' },
+            { name: 'AI Assist for JSM', vendor: 'AppsFoundry', func: 'Productivity', description: 'Adds AI-generated solutions as internal comments for agents. Requires customer to provide their own OpenAI API key.' },
+            { name: 'WorkFlow Pro', vendor: 'Appfire', func: 'Helper', description: 'An AI assistant that helps Jira admins find the right automation solution for a task by recommending specific apps.' }
+        ]
+    };
+
+    const capabilitiesTabContent = document.getElementById('tab-content');
+    const capabilitiesTabButtons = document.querySelectorAll('.tab-button');
+    
+    function renderCapabilities(tab) {
+        const content = data.capabilities[tab];
+        capabilitiesTabContent.innerHTML = `
+            <div class="max-w-4xl mx-auto">
+                <h4 class="text-2xl font-bold text-center">${content.title}</h4>
+                <p class="mt-2 text-stone-600 text-center">${content.description}</p>
+                <div class="mt-8 grid md:grid-cols-3 gap-6">
+                    ${content.features.map(f => `
+                        <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                            <h5 class="font-semibold text-stone-900">${f.name}</h5>
+                            <p class="mt-2 text-sm text-stone-600">${f.detail}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    capabilitiesTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tab = button.dataset.tab;
+            capabilitiesTabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            renderCapabilities(tab);
+        });
+    });
+
+    const comparisonContainer = document.getElementById('comparison-container');
+    const comparisonToggle = document.getElementById('comparison-toggle');
+
+    function renderComparison() {
+        const isEnhanced = comparisonToggle.checked;
+        comparisonContainer.innerHTML = `
+            <div class="lg:col-span-12">
+                ${data.comparison.map((item, index) => `
+                    <div class="flex items-start mb-6">
+                        <div class="flex flex-col items-center mr-4">
+                            <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-lg ${isEnhanced ? 'bg-teal-600 text-white' : 'bg-stone-300 text-stone-700'} transition-colors duration-300">${index + 1}</div>
+                             ${index < data.comparison.length - 1 ? '<div class="w-px h-24 bg-stone-300"></div>' : ''}
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-lg text-stone-800">${item.stage}</h4>
+                            <p class="text-stone-600 mt-1">${isEnhanced ? item.enhanced : item.standard}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    comparisonToggle.addEventListener('change', renderComparison);
+
+    const benefitsChartCtx = document.getElementById('benefitsChart').getContext('2d');
+    new Chart(benefitsChartCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Faster Change Approval', 'Ticket Handling Efficiency', 'Time Saved per Incident'],
+            datasets: [{
+                label: 'Potential Improvement',
+                data: [35, 30, 15],
+                backgroundColor: 'rgba(20, 184, 166, 0.6)',
+                borderColor: 'rgba(13, 148, 136, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) { label += ': '; }
+                            if (context.parsed.x !== null) {
+                                if (context.label.includes('Time')) {
+                                   label += `~${Math.round(60 * (context.parsed.x/100))} minutes`;
+                                } else {
+                                   label += `${context.parsed.x}%`;
+                                }
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: { x: { beginAtZero: true, title: { display: true, text: 'Improvement (%) / Time Saved' } } }
+        }
+    });
+
+    const risksContainer = document.querySelector('#risks-section .space-y-4');
+    risksContainer.innerHTML = data.risks.map(risk => `
+        <div class="bg-white p-4 rounded-lg shadow-md border border-stone-200 flex items-start">
+            <div class="text-2xl mr-4">${risk.icon}</div>
+            <div>
+                <h5 class="font-semibold text-stone-900">${risk.title}</h5>
+                <p class="text-sm text-stone-600">${risk.description}</p>
+            </div>
+        </div>
+    `).join('');
+    
+    const phasesContainer = document.getElementById('phases-container');
+    const phaseDetailsContainer = document.getElementById('phase-details-container');
+    
+    phasesContainer.innerHTML = data.phases.map((phase, index) => `
+        <div class="phase-step cursor-pointer p-2 border-2 border-stone-300 rounded-lg flex items-center transition-colors duration-300" data-phase="${phase.number}">
+            <div class="phase-number w-8 h-8 rounded-full bg-stone-300 text-stone-700 flex items-center justify-center font-bold mr-3 transition-colors duration-300">${phase.number}</div>
+            <span class="font-semibold">${phase.title}</span>
+        </div>
+        ${index < data.phases.length - 1 ? '<div class="hidden md:block w-12 h-px bg-stone-300"></div>' : ''}
+    `).join('');
+
+    function renderPhaseDetails(phaseNumber) {
+        const phase = data.phases.find(p => p.number == phaseNumber);
+        phaseDetailsContainer.innerHTML = `
+            <h5 class="text-xl font-bold mb-4 text-teal-700">Phase ${phase.number}: ${phase.title}</h5>
+            <div class="grid md:grid-cols-3 gap-6 text-left">
+                <div><h6 class="font-semibold text-stone-500 uppercase tracking-wider text-sm">Action</h6><p class="mt-1 text-stone-700">${phase.details.action}</p></div>
+                <div><h6 class="font-semibold text-stone-500 uppercase tracking-wider text-sm">Focus</h6><p class="mt-1 text-stone-700">${phase.details.focus}</p></div>
+                <div><h6 class="font-semibold text-stone-500 uppercase tracking-wider text-sm">Goal</h6><p class="mt-1 text-stone-700">${phase.details.goal}</p></div>
+            </div>
+        `;
+        document.querySelectorAll('.phase-step').forEach(step => step.classList.toggle('active', step.dataset.phase == phaseNumber));
+    }
+
+    phasesContainer.addEventListener('click', e => {
+        const phaseStep = e.target.closest('.phase-step');
+        if (phaseStep) { renderPhaseDetails(phaseStep.dataset.phase); }
+    });
+    
+    const marketplaceFilters = document.getElementById('marketplace-filters');
+    const marketplaceGrid = document.getElementById('marketplace-grid');
+    const appFunctions = ['All', ...new Set(data.marketplaceApps.map(app => app.func))];
+    
+    marketplaceFilters.innerHTML = appFunctions.map(func => `<button class="mkt-filter-btn px-4 py-2 text-sm font-medium border border-stone-300 rounded-full hover:bg-stone-100 transition-colors duration-200" data-filter="${func}">${func}</button>`).join('');
+
+    function renderMarketplaceApps(filter = 'All') {
+        const filteredApps = filter === 'All' ? data.marketplaceApps : data.marketplaceApps.filter(app => app.func === filter);
+        marketplaceGrid.innerHTML = filteredApps.map(app => `
+            <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                <div class="flex justify-between items-start">
+                    <h5 class="font-bold text-stone-900">${app.name}</h5>
+                    <span class="text-xs font-semibold bg-teal-100 text-teal-800 px-2 py-1 rounded-full">${app.func}</span>
+                </div>
+                <p class="text-sm text-stone-500 mt-1">by ${app.vendor}</p>
+                <p class="text-sm text-stone-600 mt-4">${app.description}</p>
+            </div>
+        `).join('');
+    }
+
+    marketplaceFilters.addEventListener('click', e => {
+        if (e.target.classList.contains('mkt-filter-btn')) {
+            document.querySelectorAll('.mkt-filter-btn').forEach(btn => btn.classList.remove('bg-teal-600', 'text-white', 'border-teal-600'));
+            e.target.classList.add('bg-teal-600', 'text-white', 'border-teal-600');
+            renderMarketplaceApps(e.target.dataset.filter);
+        }
+    });
+    
+    const audioButtons = document.querySelectorAll('.audio-btn');
+    let currentAudio = null;
+    let currentButton = null;
+
+    audioButtons.forEach(button => {
+        const audioId = button.dataset.audioId;
+        const audio = document.getElementById(audioId);
+
+        button.addEventListener('click', () => {
+            if (audio.src.endsWith('placeholder.mp3') || !audio.src) {
+                console.warn(`Audio source for '${audioId}' is a placeholder. Please replace "placeholder.mp3" with a valid audio file URL.`);
+                button.classList.add('animate-pulse');
+                setTimeout(() => button.classList.remove('animate-pulse'), 1000);
+                return;
+            }
+
+            if (currentAudio && currentAudio !== audio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                if(currentButton) currentButton.classList.remove('playing');
+            }
+
+            if (audio.paused) {
+                audio.play().catch(e => console.error("Audio playback failed: ", e));
+                button.classList.add('playing');
+                currentAudio = audio;
+                currentButton = button;
+            } else {
+                audio.pause();
+                button.classList.remove('playing');
+                currentAudio = null;
+                currentButton = null;
+            }
+        });
+
+        audio.onended = () => {
+            button.classList.remove('playing');
+            currentAudio = null;
+            currentButton = null;
+        };
+    });
+
+    const header = document.getElementById('header');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('main section');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+    mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileNavLinks.forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - header.clientHeight - 20) { current = section.getAttribute('id'); }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').substring(1) === current) { link.classList.add('active'); }
+        });
+        header.classList.toggle('shadow-md', window.scrollY > 50);
+    });
+
+    function init() {
+        document.querySelector('.tab-button[data-tab="accelerate"]').click();
+        renderComparison();
+        renderPhaseDetails(1);
+        document.querySelector('.mkt-filter-btn[data-filter="All"]').click();
+        document.querySelector('.nav-link[href="#hero"]').classList.add('active');
+    }
+
+    init();
+});
+</script>
+</body>
+</html>
